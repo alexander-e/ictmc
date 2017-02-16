@@ -1,8 +1,8 @@
 # ictmc
-A Python module to approximate (conditional) lower expectations for imprecise continuous-time Markov chains
+A Python 3 module to approximate (conditional) lower expectations for imprecise continuous-time Markov chains
 
 ## About
-This Python module contains naive, non-optimised implementations of the algorithms proposed by De Bock (2017) and Erreygers and De Bock (2017).
+This Python 3 module contains naive, non-optimised implementations of the algorithms proposed by De Bock (2017) and Erreygers and De Bock (2017).
 The main reason for writing this module was to validate the results obtained in (Erreygers and De Bock, 2017), but I believe it can be used for general purposes as well.
 
 The module imports [NumPy](http://www.numpy.org/) for easy vector manipulations, [matplotlib](http://matplotlib.org/) for plotting the approximations and [tqdm](https://github.com/tqdm/tqdm) to display nice progress bars.
