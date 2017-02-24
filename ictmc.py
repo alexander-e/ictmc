@@ -23,9 +23,9 @@
 
     References
     ----------
-    .. [1] Alexander Erreygers and Jasper De Bock. ``Imprecise continuous-time
-           Markov Chains: Appriomxation Methods and Ergodicity''. Work in
-           progress.
+    .. [1] Alexander Erreygers and Jasper De Bock. ``Imprecise Continuous-Time
+           Markov Chains: Efficient Computational Methods with Guaranteed Error
+           Bounds''. arXiv:1702.07150.
     .. [2] Jasper De Bock. ``The Limit Behaviour of Imprecise Continuous-Time
            Markov Chains''.  Journal of Nonlinear Science (2017) 27:159.
            doi:10.1007/s00332-016-9328-3
@@ -827,7 +827,7 @@ class LowerTransitionRateOperator:
             self, gamble, eps=1e-3, itersteps=None, ini_delta=None, div=5):
         """Approximate the limit value of the conditional lower prevision.
 
-        This method implements Proposition 11 of [1].
+        This method implements Proposition 12 of [1].
 
         Parameters
         ----------
