@@ -1364,8 +1364,8 @@ class ConditionalLowerPrevisionsApprox:
         timediff = datetime.timedelta(seconds=self.compduration)
         print("{:,} iterations in {}".format(self.numiter,
                                              timediff))
-        print("The approximation is {}"
-              .format(self.value))
+        print("The approximation is:")
+        print(self.value)
         if self.lower_error is not None:
             print("A certain upper bound for the error is {}"
                   .format(self.lower_error))
