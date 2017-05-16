@@ -101,7 +101,7 @@ def compute_norm(f):
     float
         The maximum norm of `f`.
     """
-    norm = max(np.abs(f))
+    norm = np.abs(f).max()
     return norm
 
 
@@ -118,8 +118,25 @@ def compute_centred_norm(f):
     float
         The centred norm of `f`.
     """
-    norm = (max(f) - min(f))/2
+    norm = (f.max() - f.min())/2
     return norm
+
+
+def midpoint(f):
+    """Determine the midpoint of a gamble:
+    mid f = (max f + min f) / 2
+
+    Parameters
+    ----------
+    f : array_like
+        A function to determine the mid point of
+
+    Returns
+    -------
+    float
+        The midpoint of `f`.
+    """
+    return (f.max() + f.min()) / 2
 
 
 class LowerTransitionRateOperator:
@@ -294,8 +311,8 @@ class LowerTransitionRateOperator:
             ergodicity of (I + `delta` Q)^{`rep`}, and `coeff[1]` is a
             guaranteed upper bound.
         """
-        coeff = [0, 0]
-        poss = [0, 0]
+        coefflow = 0
+        coeffup = 0
         # Iterate over all non-trival events
         for indicatorA in product([0, 1], repeat=self.dim):
             retlow = np.copy(indicatorA)
@@ -304,14 +321,12 @@ class LowerTransitionRateOperator:
                 retlow = np.add(retlow, delta*self.eval(retlow))
                 retup = np.add(retup, -delta*self.eval(-retup))
             # Possible new lower bound
-            poss[0] = np.max(retlow) - np.min(retlow)
+            coefflow = max(coefflow, retlow.max() - retlow.min())
             # Possible new upper bound
-            poss[1] = np.max(retup) - np.min(retlow)
-            if coeff[0] < poss[0]:
-                coeff[0] = poss[0]
-            if coeff[1] < poss[1]:
-                coeff[1] = poss[1]
-        return coeff
+            coeffup = max(coeffup, retup.max() - retlow.min())
+            if coefflow >= 1:
+                break
+        return [coefflow, coeffup]
 
     def approximate_coeff_of_ergod(self, m=0, n=50, delta_max=None, ax=None):
         """Approximate the coefficient of ergodicity for several delta's.
@@ -919,7 +934,7 @@ class LowerTransitionRateOperator:
                 barval += diff
         pbar.close()
         print("After {:,} iterations, we have found that".format(numiter))
-        print("The limit value is = {} +- {}".format(np.average(g), eps))
+        print("The limit value is = {} +- {}".format(midpoint(g), eps))
         return g
 
     def approx_limit_lower_previsions_alt(
@@ -983,7 +998,7 @@ class LowerTransitionRateOperator:
         pbar.close()
         print("We needed {:,} iterations, but have found that".format(
             numloop*_itersteps))
-        print("limit = {} +- {}".format(np.average(g), 2*eps))
+        print("limit = {} +- {}".format(midpoint(g), 2*eps))
         return g, 2*eps
 
 
