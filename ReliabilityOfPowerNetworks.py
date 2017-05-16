@@ -8,8 +8,6 @@
 # Initial imports
 #################################################
 import numpy as np
-# from scipy.optimize import linprog
-import cvxopt
 import matplotlib.pyplot as plt
 # import matplotlib.cm as cm
 # import math
@@ -45,66 +43,18 @@ gamble[0] = 1
 # Initialising the lower transition rate operator
 #################################################
 
-# Improving the linear program solver
-# https://scaron.info/blog/linear-programming-in-python-with-cvxopt.html
-
-# These matrices allow for more efficient computation
-A = cvxopt.matrix([1. for i in range(n)], (1, n))
-b = cvxopt.matrix([0.], (1, 1))
-G_array = []
-h_array = []
-for i in range(n):
-    vals, x, y, h = [], [], [], []
-    ind = 0
-    for j in range(n):
-        vals.append(1)
-        x.append(ind)
-        y.append(j)
-        h.append(Qup[i, j])
-        ind += 1
-        vals.append(-1)
-        x.append(ind)
-        y.append(j)
-        h.append(- Qlow[i, j])
-        ind += 1
-    G_array.append(cvxopt.spmatrix(vals, x, y, (2*n, n)))
-    h_array.append(cvxopt.matrix(h))
-
-
-# The actual solution method
-cvxopt.solvers.options['glpk'] = {'msg_lev': 'GLP_MSG_OFF'}  # cvxopt 1.1.8
-
-_linprog = cvxopt.solvers.lp
-
 
 def apply_lower_rate(g):
-    try:
-        ret = np.empty(n)
-        c = cvxopt.matrix(g.astype(float).tolist(), (n, 1))
-        for i in range(n):
-            sol = _linprog(c, G_array[i], h_array[i], A, b, solver='glpk')
-            ret[i] = np.array(sol['x']).reshape(n).dot(g)
-        return ret
-    except:
-        print("error")
-        return g
-
-# If you do not have GLPK and/or cvxopt, you can use numpy
-# However, this will be terribly slow!
-# def apply_lower_rate_old(g):
-#     try:
-#         g = np.copy(g)
-#         ret = np.empty(n)
-#         for i in range(n):
-#             Qbounds = [(Qlow[i, j], Qup[i, j]) for j in range(0, n)]
-#             lpRes = linprog(g, A_eq=np.ones((1, n)), b_eq=[0],
-#                             bounds=Qbounds)
-#             ret[i] = lpRes.fun
-#         return ret
-#     except:
-#         print("error")
-#         return g
-
+    ret = np.zeros(n)
+    for i in range(n):
+        for j in range(n):
+            if i is not j:
+                diff = g[j] - g[i]
+                if diff > 0:
+                    ret[i] = ret[i] + Qlow[i, j] * diff
+                else:
+                    ret[i] = ret[i] + Qup[i, j] * diff
+    return ret
 
 # low_rate_op_old = ictmc.LowerTransitionRateOperator(apply_lower_rate_old, n)
 low_rate_op = ictmc.LowerTransitionRateOperator(apply_lower_rate, n)
